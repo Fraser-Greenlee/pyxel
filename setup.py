@@ -43,6 +43,7 @@ setuptools.setup(
         "pyxel.examples",
         "pyxel.examples.assets",
         "pyxel.lib.linux",
+        "pyxel.lib.emscripten",
         "pyxel.lib.macos",
         "pyxel.lib.windows",
     ],

@@ -12,6 +12,18 @@ DIST_NAME = $(shell echo $(WHEEL_NAME) | sed -E 's/.*(pyxel-.*)-py3.*/\1/')-$(PL
 WHEEL_NAME = $(shell ls $(DIST_DIR)/pyxel-*.whl)
 PYOXIDIZER_DIR = $(BUILD_DIR)/build
 
+# Emscripten
+else ifeq ($USE_EMSCRIPTEN,1)
+PLATFORM = emscripten
+PYTHON = python3
+TARGET_DIR = $(BUILD_DIR)/target/release
+SRC_LIB_FILE = $(TARGET_DIR)/lib$(PYXEL_LIB_NAME).so
+DST_LIB_FILE = $(PYXEL_LIB_DIR)/$(PYXEL_LIB_NAME).so
+
+CARGO_CLEAN = cargo clean
+CARGO_BUILD = cargo build $(BUILD_OPT)
+COPY_FILES = cp $(SRC_LIB_FILE) $(DST_LIB_FILE)
+
 # Windows
 ifneq ($(findstring CYGWIN_NT-,$(shell uname)),)
 PLATFORM = windows
