@@ -16,15 +16,35 @@ PYOXIDIZER_DIR = $(BUILD_DIR)/build
 USE_EMSCRIPTEN = 1
 
 # Emscripten
-ifeq ($USE_EMSCRIPTEN,1)
+ifeq (${USE_EMSCRIPTEN},1)
 PLATFORM = emscripten
 PYTHON = python3
-TARGET_DIR = $(BUILD_DIR)/target/release
-SRC_LIB_FILE = $(TARGET_DIR)/lib$(PYXEL_LIB_NAME).so
-DST_LIB_FILE = $(PYXEL_LIB_DIR)/$(PYXEL_LIB_NAME).so
+TARGET = wasm32-unknown-emscripten
 
-CARGO_CLEAN = cargo clean
-CARGO_BUILD = cargo build $(BUILD_OPT)
+# TARGET_DIR = $(BUILD_DIR)/target/release
+# SRC_LIB_FILE = $(TARGET_DIR)/lib$(PYXEL_LIB_NAME).so
+# DST_LIB_FILE = $(PYXEL_LIB_DIR)/$(PYXEL_LIB_NAME).so
+
+PYO3_CROSS_PYTHON_VERSION=3.8
+# want #[cfg(any(target_arch = "wasm32", target_env = "sgx"))]
+# not #[cfg(unix)]
+CARGO_CFG_TARGET_ARCH=wasm32
+CARGO_CFG_TARGET_ENV=sgx
+PYO3_CROSS_LIB_DIR=/pyodide_root/cpython/installs/python-3.8.2/lib/python3.8
+PYO3_CROSS_INCLUDE_DIR=/pyodide_root/cpython/installs/python-3.8.2/include/python3.8
+RUSTFLAGS="-C relocation-model=pic -C link-arg=-shared -C link-arg=--imported-memory -C link-arg=--no-fatal-warnings'"
+
+CARGO_CLEAN = cargo clean --target=$(TARGET)
+CARGO_VARS = \
+	SDKROOT=$(shell xcrun -sdk macosx --show-sdk-path) \
+	MACOSX_DEPLOYMENT_TARGET=$(shell xcrun -sdk macosx --show-sdk-platform-version) \
+	PYO3_CROSS_INCLUDE_DIR="/home/pyo3/cross/sysroot/usr/include" \
+	PYO3_CROSS_LIB_DIR="/home/pyo3/cross/sysroot/usr/lib"
+CARGO_BUILD = \
+	rustup target add $(TARGET) && \
+	$(CARGO_VARS) cargo build $(BUILD_OPT) --target=$(TARGET)
+
+# TODO: what to copy?
 COPY_FILES = cp $(SRC_LIB_FILE) $(DST_LIB_FILE)
 
 # Windows
@@ -102,7 +122,9 @@ format:
 	@flake8 $(ROOT_DIR)/*.py $(PYXEL_DIR)
 
 build:
+	echo "build..."
 	$(CARGO_BUILD)
+	echo "copy..."
 	@$(COPY_FILES)
 
 test: build
