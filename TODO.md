@@ -13,4 +13,5 @@
     - [ ] Use custom pyodide version to build this.
         - [x] Build custom Pyodide on Docker
             - This took hours to run.
+            - Completed in container `affectionate_booth`.
         - [ ] Try building the codebase with this.
