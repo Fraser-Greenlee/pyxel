@@ -5,11 +5,12 @@
         - Runs on "Emscripten" OS
         - Use `wasm32-unknown-emscripten` target to it can use libraries.
         - Add as another target in `lib/Makefile`
-    - [ ] debug build fail
-        - [ ] understand logs
-            - [ ] What does the `stdout` mean?
-                cargo:rerun-if-env-changed=PYO3_CROSS
-                cargo:rerun-if-env-changed=PYO3_CROSS_LIB_DIR
-                cargo:rerun-if-env-changed=PYO3_CROSS_PYTHON_VERSION
-            - [ ] What file path was it trying to load?
-        - [ ] Try make a mini alt project, maybe there's obvious stuff I'm missing?
+    - [x] debug build fail
+        - [x] understand logs
+            - Python version is incorrectly configured https://pyo3.rs/v0.14.2/building_and_distribution.html
+            - Turns out Pyo3-Rust is not a solved problem https://github.com/pyodide/pyodide/issues/1973
+            - Best case is to try this branch https://github.com/pyodide/pyodide/pull/2081
+    - [ ] Use custom pyodide version to build this.
+        - [x] Build custom Pyodide on Docker
+            - This took hours to run.
+        - [ ] Try building the codebase with this.
